@@ -18,6 +18,7 @@ const deleteUploadedLocalFiles = (path) => {
       if (result) {
       } else return error;
     });
+    // console.log("successfully deleted cloud file");
  }
 
  module.exports = {

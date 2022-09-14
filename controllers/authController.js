@@ -41,7 +41,7 @@ const register = async (req, res) => {
       publicId: files[1],
     });
 
-    user.save();
+   await user.save();
     return res.json({
       message: "User saved successfully!",
       user,
@@ -61,14 +61,13 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const hashedPass = await bcrypt.hash(req.body.password, 10);
 
     const passwordMatch = await bcrypt.compareSync(
       req.body.password,
       user.password
     );
     if (!passwordMatch) {
-      return res.status(403).json({ message: " Wrong password entered" });
+      return res.status(403).json({ message: "Wrong password entered" });
     }
     let token = jwt.sign({ email: user.email }, config.secretKey, {
       expiresIn: "1h",
