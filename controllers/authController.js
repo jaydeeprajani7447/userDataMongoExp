@@ -8,15 +8,12 @@ const {
 } = require("../helper/deleteUploadedFiles");
 const config = require("../config/config");
 const cloudinary = require("cloudinary").v2;
-const fileDetails = require("../helper/cloudinary");
-
-// console.log(process.cwd());
+const fileDetails = require("../cloudinary");
 
 const register = async (req, res) => {
   try {
-    const email = req.body.email;
-    const userExisted = await User.findOne({ email });
-
+    const userExisted = await User.findOne({ email:req.body.email });
+  
     if (userExisted) {
       for (i = 0; i < req.files.length; i++) {
         await deleteUploadedLocalFiles(req.files[i].path);
@@ -24,13 +21,10 @@ const register = async (req, res) => {
 
       return res.status(200).json({ message: "User already exists" });
     }
-
     const files = await fileDetails.cloudUpload(req);
-
     for (i = 0; i < req.files.length; i++) {
       await deleteUploadedLocalFiles(req.files[i].path);
     }
-
     const hashedPass = await bcrypt.hash(req.body.password, 10);
     let user = new User({
       fullName: req.body.fullName,
@@ -54,9 +48,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const email = req.body.email;
-    console.log("email :>> ", email);
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email:req.body.email }).select("+password");
     // res.json(user)
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -86,9 +78,7 @@ const login = async (req, res) => {
 
 const get = async (req, res) => {
   try {
-    const email = res.locals.decoded.email;
-    // console.log(email);
-    const user = await User.find({ email });
+    const user = await User.find({ email:req.user.email});
     return res
       .status(200)
       .json({ message: "Retrieved data successfully", user });
@@ -100,7 +90,7 @@ const get = async (req, res) => {
 const update = async (req, res) => {
   try {
     const existedUserDetails = await User.find({
-      email: res.locals.decoded.email,
+      email: req.user.email,
     });
 
     const files = await fileDetails.cloudUpload(req);
@@ -111,7 +101,7 @@ const update = async (req, res) => {
     }
 
     const user = await User.findOneAndUpdate(
-      { email: res.locals.decoded.email },
+      { email: req.user.email },
       {
         $set: {
           fullName: req.body.fullName,
@@ -140,7 +130,7 @@ const update = async (req, res) => {
 
 const changePassword = async (req, res) => {
   try {
-    const user = await User.findOne({ email: res.locals.decoded.email });
+    const user = await User.findOne({ email: req.user.email }).select("+password");
 
     const matchOldPassword = await bcrypt.compareSync(
       req.body.oldPassword,
@@ -151,7 +141,7 @@ const changePassword = async (req, res) => {
     }
     const hashedPass = await bcrypt.hash(req.body.newPassword, 10);
     const userUpdate = await User.findOneAndUpdate(
-      { email: res.locals.decoded.email },
+      { email: req.user.email },
       {
         $set: {
           password: hashedPass,
@@ -173,3 +163,4 @@ module.exports = {
   update,
   changePassword,
 };
+ 

@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 
@@ -9,7 +10,11 @@ const tokenVerification = (req, res, next) => {
   const token = headerToken.split(" ")[1];
   try {
     const decoded = jwt.verify(token, config.secretKey);
-    res.locals.decoded = decoded;
+    // req.user = decoded;
+    req.user = decoded;
+    // req.user.decoded = decoded;
+    // console.log('req.user.decoded :>> ', req.user.decoded);
+    console.log('req.user :>> ', req.user);
   } catch (error) {
     console.log(error);
     return res.status(401).send({ message: "Invalid token" });

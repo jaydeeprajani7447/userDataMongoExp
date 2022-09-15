@@ -2,13 +2,13 @@ const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
 const { uploadImage } = require("../controllers/multer");
-const { cloudUpload } = require("../helper/cloudinary");
+const { cloudUpload } = require("../cloudinary");
 const { validate } = require("../middlewares/validationMiddleware");
 const {
   userRegistrationDataValidation,
   userLoginDataValidation,
   userPasswordValidation,
-} = require("../controllers/user/userValidation");
+} = require("../middlewares/userValidation");
 const {
   tokenVerification,
 } = require("../middlewares/tokenVerificationMiddleware");

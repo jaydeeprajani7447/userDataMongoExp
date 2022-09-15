@@ -16,9 +16,10 @@ const cloudUpload = async (req) => {
   const urlList = [];
   const publicIds = [];
   try {
+    console.log('req.files[i].path :>> ', req.files);
     for (let i = 0; i < req.files.length; i++) {
       await cloudinary.uploader.upload(
-        req.files[i].path,
+                req.files[i].path,
         { folder: "images" },
         (err, result) => {
           urlList.push(result.url);
