@@ -79,7 +79,6 @@ const login = async (req, res) => {
 const get = async (req, res) => {
   try {
     const user = await User.find({ email:req.user.email});
-    console.log('user',user);
     return res
       .status(200)
       .json({ message: "Retrieved data successfully", user });
